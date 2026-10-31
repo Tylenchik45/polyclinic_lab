@@ -1,0 +1,126 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Exception {
+}
+
+class PolyclinicBaseError {
+}
+
+class PatientNotFoundError {
+}
+
+class DataStorageError {
+}
+
+Exception <|-- PolyclinicBaseError
+PolyclinicBaseError <|-- PatientNotFoundError
+PolyclinicBaseError <|-- DataStorageError
+
+abstract class Person {
+  +id: str
+  +full_name: str
+  +birth_date: str
+  +phone: str
+  +get_info(): str
+}
+
+class Patient {
+  +policy_number: str
+  +address: str
+  +medical_record: MedicalRecord
+  +add_diagnosis(diagnosis: Diagnosis): void
+}
+
+abstract class Employee {
+  +employee_id: str
+  +position: str
+  +salary: float
+}
+
+class Doctor {
+  +specialization: str
+  +office_number: str
+  +schedule: Schedule
+  +add_appointment(appointment: Appointment): void
+}
+
+class Administrator {
+  +access_level: str
+  +manage_department(dept: Department): void
+}
+
+class Department {
+  +dept_id: str
+  +name: str
+  +head_doctor: Doctor
+  +doctors: list
+  +add_doctor(doctor: Doctor): void
+}
+
+class Appointment {
+  +appointment_id: str
+  +date: str
+  +time: str
+  +status: str
+  +patient: Patient
+  +doctor: Doctor
+}
+
+class MedicalRecord {
+  +record_id: str
+  +patient_id: str
+  +diagnoses: list
+  +prescriptions: list
+}
+
+class Diagnosis {
+  +icd_code: str
+  +description: str
+  +date: str
+}
+
+class Prescription {
+  +medication: str
+  +dosage: str
+  +duration_days: int
+}
+
+class Schedule {
+  +doctor_id: str
+  +available_slots: list
+  +add_slot(slot: str): void
+}
+
+class PolyclinicSystem {
+  -patients: dict
+  -doctors: dict
+  -departments: dict
+  +add_patient(patient: Patient): void
+  +get_patient(patient_id: str): Patient
+  +update_patient_phone(patient_id: str, new_phone: str): void
+  +delete_patient(patient_id: str): void
+  +add_department(department: Department): void
+  +export_to_json(filepath: str): void
+  +import_from_json(filepath: str): void
+  +export_to_xml(filepath: str): void
+  +import_from_xml(filepath: str): void
+}
+
+Person <|-- Patient
+Person <|-- Employee
+Employee <|-- Doctor
+Employee <|-- Administrator
+
+PolyclinicSystem "1" *-- "*" Patient : имеет
+PolyclinicSystem "1" *-- "*" Doctor : имеет
+PolyclinicSystem "1" *-- "*" Department : управляет
+Department "1" *-- "*" Doctor : имеет
+
+Doctor "1" *-- "1" Schedule : имеет
+Patient "1" *-- "1" MedicalRecord : имеет
+MedicalRecord "1" *-- "*" Diagnosis : содержит
+MedicalRecord "1" *-- "*" Prescription : содержит
+Doctor "1" -- "*" Appointment : проводит
+Patient "1" -- "*" Appointment : посещает
+@enduml
