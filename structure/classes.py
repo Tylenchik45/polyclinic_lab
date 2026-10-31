@@ -38,8 +38,8 @@ class Prescription:
 
 # Класс для медицинской карты
 class MedicalCard:
-    def __init__(self, record_id, patient_id):
-        self.record_id = record_id
+    def __init__(self, card_id, patient_id):
+        self.card_id = card_id
         self.patient_id = patient_id
         self.diagnoses = []
         self.prescriptions = []
@@ -52,7 +52,7 @@ class Patient(Person):
         super(Patient, self).__init__(person_id, full_name, birth_date, phone)
         self.policy_number = policy_number
         self.address = address
-        self.medical_card = MedicalCard(record_id="MR" + person_id, patient_id=person_id)
+        self.medical_card = MedicalCard(card_id="MR" + person_id, patient_id=person_id)
 
     def add_diagnosis(self, diagnosis):
         # Можем добавить диагноз в медицинскую карту
