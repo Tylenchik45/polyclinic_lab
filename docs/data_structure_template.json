@@ -8,7 +8,7 @@
         "phone": "+78005553535",
         "policy_number": "1234567890123456",
         "address": "г. Москва, ул. Нагорная, д. 1",
-        "medical_record": {
+        "medical_card": {
           "record_id": "MR001",
           "diagnoses": [
             {"icd_code": "T02.2", "description": "Переломы, захватывающие несколько областей одной верхней конечности", "date": "2026-02-01"}

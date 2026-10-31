@@ -7,7 +7,7 @@
             <phone>+78005553535</phone>
             <policy_number>1234567890123456</policy_number>
             <address>г. Москва, ул. Нагорная, д. 1</address>
-            <medical_record record_id="MR001">
+            <medical_card record_id="MR001">
                 <diagnoses>
                     <diagnosis icd_code="T02.2" date="2026-02-01">Переломы, захватывающие несколько областей одной верхней конечности</diagnosis>
                 </diagnoses>
@@ -17,7 +17,7 @@
                         <dosage>500мг</dosage>
                     </prescription>
                 </prescriptions>
-            </medical_record>
+            </medical_card>
         </patient>
     </patients>
     <doctors>
