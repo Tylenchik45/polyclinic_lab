@@ -20,7 +20,6 @@ class PolyclinicSystem:
 
     def add_patient(self, patient):
         if patient.id in self.patients:
-            # Забыл прописать свою ошибку для уже существующего id, пока оставлю ValueError, мб так и оставлю
             raise PatientAlreadyExistError("Пациент с ID " + patient.id + " уже существует.")
         self.patients[patient.id] = patient
 
@@ -65,8 +64,8 @@ class PolyclinicSystem:
                 "phone": p.phone,
                 "policy_number": p.policy_number,
                 "address": p.address,
-                "medical_record": {
-                    "record_id": p.medical_card.record_id,
+                "medical_card": {
+                    "record_id": p.medical_card.card_id,
                     # Подблок о диагнозе
                     "diagnoses": [
                         {"icd_code": d.icd_code, "description": d.description, "date": d.date}
@@ -106,16 +105,16 @@ class PolyclinicSystem:
 
         # Блок о пациенте
         for p_data in polyclinic_data.get("patients", []):
-            mr_data = p_data.get("medical_record", {})
-            mr = MedicalCard(record_id=mr_data.get("record_id", ""), patient_id=p_data["id"])
+            mc_data = p_data.get("medical_card", {})
+            mc = MedicalCard(card_id=mc_data.get("card_id", ""), patient_id=p_data["id"])
 
             # Подблок о диагнозе
-            for d in mr_data.get("diagnoses", []):
-                mr.diagnoses.append(Diagnosis(icd_code=d["icd_code"], description=d["description"], date=d["date"]))
+            for d in mc_data.get("diagnoses", []):
+                mc.diagnoses.append(Diagnosis(icd_code=d["icd_code"], description=d["description"], date=d["date"]))
 
             # Подблок о рецепте
-            for pr in mr_data.get("prescriptions", []):
-                mr.prescriptions.append(Prescription(
+            for pr in mc_data.get("prescriptions", []):
+                mc.prescriptions.append(Prescription(
                     medication=pr["medication"], dosage=pr["dosage"], duration_days=pr["duration_days"]
                 ))
 
@@ -123,7 +122,7 @@ class PolyclinicSystem:
                 person_id=p_data["id"], full_name=p_data["full_name"], birth_date=p_data["birth_date"],
                 phone=p_data["phone"], policy_number=p_data["policy_number"], address=p_data["address"]
             )
-            patient.medical_record = mr
+            patient.medical_record = mc
             self.patients[patient.id] = patient
 
         # Блок о врачах
@@ -151,17 +150,17 @@ class PolyclinicSystem:
             Et.SubElement(p_elem, "policy_number").text = p.policy_number
             Et.SubElement(p_elem, "address").text = p.address
 
-            mr_elem = Et.SubElement(p_elem, "medical_record", record_id=p.medical_record.record_id)
+            mc_elem = Et.SubElement(p_elem, "medical_card", card_id=p.medical_card.card_id)
 
             # Подблок о диагнозе
-            diagnoses_elem = Et.SubElement(mr_elem, "diagnoses")
-            for d in p.medical_record.diagnoses:
+            diagnoses_elem = Et.SubElement(mc_elem, "diagnoses")
+            for d in p.medical_card.diagnoses:
                 d_elem = Et.SubElement(diagnoses_elem, "diagnosis", icd_code=d.icd_code, date=d.date)
                 d_elem.text = d.description
 
             # Подблок о рецепте
-            prescriptions_elem = Et.SubElement(mr_elem, "prescriptions")
-            for pr in p.medical_record.prescriptions:
+            prescriptions_elem = Et.SubElement(mc_elem, "prescriptions")
+            for pr in p.medical_card.prescriptions:
                 pr_elem = Et.SubElement(prescriptions_elem, "prescription", duration_days=str(pr.duration_days))
                 Et.SubElement(pr_elem, "medication").text = pr.medication
                 Et.SubElement(pr_elem, "dosage").text = pr.dosage
@@ -199,14 +198,14 @@ class PolyclinicSystem:
                 phone=phone, policy_number=policy_number, address=address
             )
 
-            mr_elem = p_elem.find("medical_record")
-            if mr_elem is not None:
-                mr = MedicalCard(record_id=mr_elem.get("record_id", ""), patient_id=patient_id)
-                for d_elem in mr_elem.findall(".//diagnosis"):
+            mc_elem = p_elem.find("medical_record")
+            if mc_elem is not None:
+                mr = MedicalCard(card_id=mc_elem.get("card_id", ""), patient_id=patient_id)
+                for d_elem in mc_elem.findall(".//diagnosis"):
                     mr.diagnoses.append(Diagnosis(
                         icd_code=d_elem.get("icd_code"), description=d_elem.text, date=d_elem.get("date")
                     ))
-                for pr_elem in mr_elem.findall(".//prescription"):
+                for pr_elem in mc_elem.findall(".//prescription"):
                     mr.prescriptions.append(Prescription(
                         medication=pr_elem.find("medication").text,
                         dosage=pr_elem.find("dosage").text,
