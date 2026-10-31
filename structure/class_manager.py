@@ -8,7 +8,8 @@
 import xml.etree.ElementTree as Et
 from structure.classes import Patient, Doctor, MedicalCard, Diagnosis, Prescription
 from storage.file_handler import save_to_json, load_from_json, save_to_xml, load_from_xml
-from exceptions.custom_errors import PatientNotFoundError, DoctorNotFoundError
+from exceptions.custom_errors import (PatientNotFoundError, PatientAlreadyExistError, DoctorNotFoundError,
+                                      DoctorAlreadyExistError)
 
 
 class PolyclinicSystem:
@@ -20,7 +21,7 @@ class PolyclinicSystem:
     def add_patient(self, patient):
         if patient.id in self.patients:
             # Забыл прописать свою ошибку для уже существующего id, пока оставлю ValueError, мб так и оставлю
-            raise ValueError("Пациент с ID " + patient.id + " уже существует.")
+            raise PatientAlreadyExistError("Пациент с ID " + patient.id + " уже существует.")
         self.patients[patient.id] = patient
 
     def get_patient(self, patient_id):
@@ -39,8 +40,7 @@ class PolyclinicSystem:
 
     def add_doctor(self, doctor):
         if doctor.id in self.doctors:
-            # Забыл прописать свою ошибку для уже существующего id, пока оставлю ValueError, мб так и оставлю
-            raise ValueError("Врач с ID " + doctor.id + " уже существует.")
+            raise DoctorAlreadyExistError("Врач с ID " + doctor.id + " уже существует.")
         self.doctors[doctor.id] = doctor
 
     def get_doctor(self, doctor_id):
