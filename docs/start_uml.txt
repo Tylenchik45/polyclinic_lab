@@ -7,14 +7,22 @@ class Exception {
 class PolyclinicBaseError {
 }
 
+class PersonBaseError{
+}
+
 class PatientNotFoundError {
+}
+
+class DoctorNotFoundError{
 }
 
 class DataStorageError {
 }
 
 Exception <|-- PolyclinicBaseError
-PolyclinicBaseError <|-- PatientNotFoundError
+PolyclinicBaseError <|-- PersonBaseError
+PersonBaseError <|-- PatientNotFoundError
+PersonBaseError <|-- DoctorNotFoundError
 PolyclinicBaseError <|-- DataStorageError
 
 abstract class Person {
