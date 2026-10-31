@@ -13,7 +13,13 @@ class PersonBaseError{
 class PatientNotFoundError {
 }
 
+class PatientAlreadyExistError {
+}
+
 class DoctorNotFoundError{
+}
+
+class DoctorAlreadyExistError {
 }
 
 class DataStorageError {
@@ -23,6 +29,8 @@ Exception <|-- PolyclinicBaseError
 PolyclinicBaseError <|-- PersonBaseError
 PersonBaseError <|-- PatientNotFoundError
 PersonBaseError <|-- DoctorNotFoundError
+PersonBaseError <|-- PatientAlreadyExistError
+PersonBaseError <|-- DoctorAlreadyExistError
 PolyclinicBaseError <|-- DataStorageError
 
 abstract class Person {
