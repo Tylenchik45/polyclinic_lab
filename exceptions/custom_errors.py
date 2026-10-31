@@ -19,8 +19,16 @@ class PatientNotFoundError(PersonBaseError):
     """Исключение, возникающее при попытке найти несуществующего пациента."""
     pass
 
+class PatientAlreadyExistError(PersonBaseError):
+    """Исключение, возникающее при попытке найти несуществующего пациента."""
+    pass
+
 
 class DoctorNotFoundError(PersonBaseError):
+    """Исключение, возникающее при попытке найти несуществующего врача."""
+    pass
+
+class DoctorAlreadyExistError(PersonBaseError):
     """Исключение, возникающее при попытке найти несуществующего врача."""
     pass
 
