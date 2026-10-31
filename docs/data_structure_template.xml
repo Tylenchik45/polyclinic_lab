@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<polyclinic>
+    <patients>
+        <patient id="P001">
+            <full_name>Иванов Иван Иванович</full_name>
+            <birth_date>2006-08-16</birth_date>
+            <phone>+78005553535</phone>
+            <policy_number>1234567890123456</policy_number>
+            <address>г. Москва, ул. Нагорная, д. 1</address>
+            <medical_record record_id="MR001">
+                <diagnoses>
+                    <diagnosis icd_code="T02.2" date="2026-02-01">Переломы, захватывающие несколько областей одной верхней конечности</diagnosis>
+                </diagnoses>
+                <prescriptions>
+                    <prescription duration_days="5">
+                        <medication>Парацетамол</medication>
+                        <dosage>500мг</dosage>
+                    </prescription>
+                </prescriptions>
+            </medical_record>
+        </patient>
+    </patients>
+    <doctors>
+        <doctor id="D001">
+            <full_name>Двачевская Алиса Семеновна</full_name>
+            <birth_date>1975-10-29</birth_date>
+            <phone>+79774375311</phone>
+            <employee_id>EMP001</employee_id>
+            <position>Врач</position>
+            <salary>85000.0</salary>
+            <specialization>Терапевт</specialization>
+            <office_number>101</office_number>
+        </doctor>
+    </doctors>
+</polyclinic>
