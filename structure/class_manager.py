@@ -66,16 +66,16 @@ class PolyclinicSystem:
                 "policy_number": p.policy_number,
                 "address": p.address,
                 "medical_record": {
-                    "record_id": p.medical_record.record_id,
+                    "record_id": p.medical_card.record_id,
                     # Подблок о диагнозе
                     "diagnoses": [
                         {"icd_code": d.icd_code, "description": d.description, "date": d.date}
-                        for d in p.medical_record.diagnoses
+                        for d in p.medical_card.diagnoses
                     ],
                     # Подблок о рецепте
                     "prescriptions": [
                         {"medication": pr.medication, "dosage": pr.dosage, "duration_days": pr.duration_days}
-                        for pr in p.medical_record.prescriptions
+                        for pr in p.medical_card.prescriptions
                     ]
                 }
             }
