@@ -52,3 +52,182 @@ class PolyclinicSystem:
     def add_department(self, department):
         self.departments[department.dept_id] = department
 
+    # Экспорт в JSON
+    def export_to_json(self, filepath):
+        # Основной блок
+        data = {"polyclinic": {"patients": [], "doctors": []}}
+
+        # Блок о пациенте
+        for p in self.patients.values():
+            patient_dict = {
+                "id": p.id,
+                "full_name": p.full_name,
+                "birth_date": p.birth_date,
+                "phone": p.phone,
+                "policy_number": p.policy_number,
+                "address": p.address,
+                "medical_record": {
+                    "record_id": p.medical_record.record_id,
+                    # Подблок о диагнозе
+                    "diagnoses": [
+                        {"icd_code": d.icd_code, "description": d.description, "date": d.date}
+                        for d in p.medical_record.diagnoses
+                    ],
+                    # Подблок о рецепте
+                    "prescriptions": [
+                        {"medication": pr.medication, "dosage": pr.dosage, "duration_days": pr.duration_days}
+                        for pr in p.medical_record.prescriptions
+                    ]
+                }
+            }
+            data["polyclinic"]["patients"].append(patient_dict)
+
+        # Блок о врачах
+        for d in self.doctors.values():
+            doctor_dict = {
+                "id": d.id,
+                "full_name": d.full_name,
+                "birth_date": d.birth_date,
+                "phone": d.phone,
+                "employee_id": d.employee_id,
+                "position": d.position,
+                "salary": d.salary,
+                "specialization": d.specialization,
+                "office_number": d.office_number
+            }
+            data["polyclinic"]["doctors"].append(doctor_dict)
+
+        save_to_json(data, filepath)
+
+    # Импорт из JSON
+    def import_from_json(self, filepath):
+        data = load_from_json(filepath)
+        # Основной блок
+        polyclinic_data = data.get("polyclinic", {})
+
+        # Блок о пациенте
+        for p_data in polyclinic_data.get("patients", []):
+            mr_data = p_data.get("medical_record", {})
+            mr = MedicalCard(record_id=mr_data.get("record_id", ""), patient_id=p_data["id"])
+
+            # Подблок о диагнозе
+            for d in mr_data.get("diagnoses", []):
+                mr.diagnoses.append(Diagnosis(icd_code=d["icd_code"], description=d["description"], date=d["date"]))
+
+            # Подблок о рецепте
+            for pr in mr_data.get("prescriptions", []):
+                mr.prescriptions.append(Prescription(
+                    medication=pr["medication"], dosage=pr["dosage"], duration_days=pr["duration_days"]
+                ))
+
+            patient = Patient(
+                person_id=p_data["id"], full_name=p_data["full_name"], birth_date=p_data["birth_date"],
+                phone=p_data["phone"], policy_number=p_data["policy_number"], address=p_data["address"]
+            )
+            patient.medical_record = mr
+            self.patients[patient.id] = patient
+
+        # Блок о врачах
+        for d_data in polyclinic_data.get("doctors", []):
+            doctor = Doctor(
+                person_id=d_data["id"], full_name=d_data["full_name"], birth_date=d_data["birth_date"],
+                phone=d_data["phone"], employee_id=d_data["employee_id"], position=d_data["position"],
+                salary=d_data["salary"], specialization=d_data["specialization"],
+                office_number=d_data["office_number"]
+            )
+            self.doctors[doctor.id] = doctor
+
+    # Экспорт в XML
+    def export_to_xml(self, filepath):
+        # Основной блок
+        root = Et.Element("polyclinic")
+
+        # Блок о пациенте
+        patients_elem = Et.SubElement(root, "patients")
+        for p in self.patients.values():
+            p_elem = Et.SubElement(patients_elem, "patient", id=p.id)
+            Et.SubElement(p_elem, "full_name").text = p.full_name
+            Et.SubElement(p_elem, "birth_date").text = p.birth_date
+            Et.SubElement(p_elem, "phone").text = p.phone
+            Et.SubElement(p_elem, "policy_number").text = p.policy_number
+            Et.SubElement(p_elem, "address").text = p.address
+
+            mr_elem = Et.SubElement(p_elem, "medical_record", record_id=p.medical_record.record_id)
+
+            # Подблок о диагнозе
+            diagnoses_elem = Et.SubElement(mr_elem, "diagnoses")
+            for d in p.medical_record.diagnoses:
+                d_elem = Et.SubElement(diagnoses_elem, "diagnosis", icd_code=d.icd_code, date=d.date)
+                d_elem.text = d.description
+
+            # Подблок о рецепте
+            prescriptions_elem = Et.SubElement(mr_elem, "prescriptions")
+            for pr in p.medical_record.prescriptions:
+                pr_elem = Et.SubElement(prescriptions_elem, "prescription", duration_days=str(pr.duration_days))
+                Et.SubElement(pr_elem, "medication").text = pr.medication
+                Et.SubElement(pr_elem, "dosage").text = pr.dosage
+
+        # Блок о врачах
+        doctors_elem = Et.SubElement(root, "doctors")
+        for d in self.doctors.values():
+            d_elem = Et.SubElement(doctors_elem, "doctor", id=d.id)
+            Et.SubElement(d_elem, "full_name").text = d.full_name
+            Et.SubElement(d_elem, "birth_date").text = d.birth_date
+            Et.SubElement(d_elem, "phone").text = d.phone
+            Et.SubElement(d_elem, "employee_id").text = d.employee_id
+            Et.SubElement(d_elem, "position").text = d.position
+            Et.SubElement(d_elem, "salary").text = str(d.salary)
+            Et.SubElement(d_elem, "specialization").text = d.specialization
+            Et.SubElement(d_elem, "office_number").text = d.office_number
+
+        save_to_xml(root, filepath)
+
+    # Импорт из XML
+    def import_from_xml(self, filepath):
+        root = load_from_xml(filepath)
+
+        # Импорт пациентов
+        for p_elem in root.findall(".//patient"):
+            patient_id = p_elem.get("id")
+            full_name = p_elem.find("full_name").text
+            birth_date = p_elem.find("birth_date").text
+            phone = p_elem.find("phone").text
+            policy_number = p_elem.find("policy_number").text
+            address = p_elem.find("address").text
+
+            patient = Patient(
+                person_id=patient_id, full_name=full_name, birth_date=birth_date,
+                phone=phone, policy_number=policy_number, address=address
+            )
+
+            mr_elem = p_elem.find("medical_record")
+            if mr_elem is not None:
+                mr = MedicalCard(record_id=mr_elem.get("record_id", ""), patient_id=patient_id)
+                for d_elem in mr_elem.findall(".//diagnosis"):
+                    mr.diagnoses.append(Diagnosis(
+                        icd_code=d_elem.get("icd_code"), description=d_elem.text, date=d_elem.get("date")
+                    ))
+                for pr_elem in mr_elem.findall(".//prescription"):
+                    mr.prescriptions.append(Prescription(
+                        medication=pr_elem.find("medication").text,
+                        dosage=pr_elem.find("dosage").text,
+                        duration_days=int(pr_elem.get("duration_days"))
+                    ))
+                patient.medical_record = mr
+
+            self.patients[patient.id] = patient
+
+        # Импорт врачей
+        for d_elem in root.findall(".//doctor"):
+            doctor = Doctor(
+                person_id=d_elem.get("id"),
+                full_name=d_elem.find("full_name").text,
+                birth_date=d_elem.find("birth_date").text,
+                phone=d_elem.find("phone").text,
+                employee_id=d_elem.find("employee_id").text,
+                position=d_elem.find("position").text,
+                salary=float(d_elem.find("salary").text),
+                specialization=d_elem.find("specialization").text,
+                office_number=d_elem.find("office_number").text
+            )
+            self.doctors[doctor.id] = doctor
